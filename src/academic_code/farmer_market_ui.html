@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Farmer-Crop-Market System - Pan-India APMC Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* 3-Slide Segmented Control & Clean Badges */
+    .slide-switcher {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .slide-btn {
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 2px solid #E2DAC5;
+      background-color: #FAF7EE;
+      color: #1B4332;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .slide-btn:hover {
+      background-color: #F4F1DE;
+    }
+    .slide-btn.active {
+      background-color: #1B4332;
+      color: #FFFFFF;
+      border-color: #1B4332;
+      box-shadow: 0 4px 12px rgba(27, 67, 50, 0.25);
+    }
+    .slide-btn.active .slide-count {
+      background-color: #E9C46A;
+      color: #1B4332;
+    }
+    .slide-count {
+      font-family: monospace;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background-color: #EAE6D6;
+      color: #1B4332;
+      font-weight: 800;
+    }
+    .high-demand-badge {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: white;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .academic-panel {
+      background-color: #1B4332;
+      color: #FFFFFF;
+      border: 2px solid #E9C46A;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 24px;
+      font-family: sans-serif;
+    }
+    .academic-panel code {
+      color: #E9C46A;
+      font-family: monospace;
+    }
+    .academic-toggle-btn {
+      background: white;
+      border: 1px solid #D8CDB2;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1B4332;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .academic-toggle-btn.on {
+      background: #1B4332;
+      color: #E9C46A;
+      border-color: #E9C46A;
+    }
+    .card-footer-action {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .btn-buy {
+      flex: 1;
+      background-color: #2D6A4F;
+      color: white;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.2s;
+    }
+    .btn-buy:hover {
+      background-color: #1B4332;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+    .modal-content {
+      background: white;
+      border: 2px solid #2D6A4F;
+      border-radius: 16px;
+      max-width: 520px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+    }
+    .tracker-steps {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin: 20px 0;
+    }
+    .tracker-steps::before {
+      content: '';
+      position: absolute;
+      top: 15px;
+      left: 10%;
+      right: 10%;
+      height: 3px;
+      background: #E2DAC5;
+      z-index: 1;
+    }
+    .tracker-step {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #52796F;
+    }
+    .tracker-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: white;
+      border: 2px solid #E2DAC5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 6px auto;
+    }
+    .tracker-step.completed .tracker-circle, .tracker-step.active .tracker-circle {
+      background: #2D6A4F;
+      color: white;
+      border-color: #2D6A4F;
+    }
+    .notification-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #1B4332;
+      color: white;
+      border-left: 5px solid #E9C46A;
+      padding: 14px 18px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      z-index: 2000;
+      max-width: 380px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Academic & Agritech Header -->
+  <header>
+    <div class="header-container">
+      <div class="brand">
+        <div class="brand-icon">🌾</div>
+        <div>
+          <h1>Farmer-Crop-Market System</h1>
+          <p>Pan-India APMC Architecture &bull; DMGT Set Partitions &bull; ADSA Dijkstra Routing &bull; Python OLS</p>
+        </div>
+      </div>
+      <div>
+        <button id="academic-toggle" class="academic-toggle-btn" onclick="toggleAcademicMode()">
+          🎓 Academic / DMGT Debug: <span id="toggle-state">OFF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Academic Debug Panel (Hidden by default) -->
+    <div id="academic-debug-panel" class="academic-panel" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2D6A4F; padding-bottom: 10px; margin-bottom: 12px;">
+        <h3 style="color: #E9C46A; margin: 0;">🎓 Academic Invariants & Mathematical Formulations</h3>
+        <button onclick="toggleAcademicMode()" style="background: none; border: none; color: #E9C46A; cursor: pointer; font-size: 14px;">✕ Close</button>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 12px;">
+        <div>
+          <h4 style="color: #E9C46A; margin: 0 0 6px 0;">DMGT: Set Theory Equivalence Partitions</h4>
+          <p style="margin: 0 0 6px 0;">Universal Set <code>U = Listings</code> partitioned by district zone equivalence relation:</p>
+          <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; font-family: monospace;">
+            &bull; Relation: (l_a, l_b) &isin; R &iff; l_a.zone_id = l_b.zone_id<br>
+            &bull; Equivalence Class: [Z_i] = &#123; l &isin; U | l.zone_id = Z_i &#125;<br>
+            &bull; Disjoint Union: &cup; [Z_i] = U and [Z_i] &cap; [Z_j] = &empty; (&forall; i &ne; j)
+          </div>
+        </div>
+        <div>
+          <h4 style="color: #E9C46A; margin: 0 0 6px 0;">ADSA: Dijkstra Shortest Highway Transit</h4>
+          <p style="margin: 0 0 6px 0;">Weighted Graph <code>G = (V, E, W)</code> using Min-Heap PriorityQueue:</p>
+          <div style="background: rgba(0,0,0,0.3); padding: 8px; border-radius: 8px; font-family: monospace;">
+            &bull; Vertices |V|: APMC District Mandis<br>
+            &bull; Edge Weights W(u, v): Freight in &#8377;/Quintal<br>
+            &bull; Complexity: O((|V| + |E|) log |V|)<br>
+            &bull; Landed Cost = Farmer Price + Dijkstra Transit
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn" onclick="switchMainView('farmer')">🌾 Farmer Portal (Post Harvest & ML Price)</button>
+      <button class="tab-btn active" onclick="switchMainView('buyer')">🚚 Buyer Portal (3-Slide Marketplace)</button>
+      <button class="tab-btn" onclick="switchMainView('tracker')">📦 Order Tracker & GST Invoices</button>
+    </div>
+
+    <!-- VIEW: BUYER PORTAL (3-Slide / 3-Tab Architecture) -->
+    <div id="view-buyer" class="view-panel">
+      <!-- 3-Slide Segmented Switcher -->
+      <div class="slide-switcher">
+        <button id="tab-slide1" class="slide-btn active" onclick="switchBuyerSlide('all')">
+          <div>
+            <div style="font-size: 13px;">🌾 Slide 1: All Available Crops</div>
+            <div style="font-size: 11px; opacity: 0.8;">Nationwide APMC active listings</div>
+          </div>
+          <span class="slide-count" id="count-all">12</span>
+        </button>
+
+        <button id="tab-slide2" class="slide-btn" onclick="switchBuyerSlide('district')">
+          <div>
+            <div style="font-size: 13px;">📍 Slide 2: Crops in My District</div>
+            <div style="font-size: 11px; opacity: 0.8;">Intradistrict &bull; &#8377;0 Highway Transit</div>
+          </div>
+          <span class="slide-count" id="count-district">4</span>
+        </button>
+
+        <button id="tab-slide3" class="slide-btn" onclick="switchBuyerSlide('demanded')">
+          <div>
+            <div style="font-size: 13px;">🔥 Slide 3: Highly Demanded Crops</div>
+            <div style="font-size: 11px; opacity: 0.8;">High Demand &bull; Sellable Now</div>
+          </div>
+          <span class="slide-count" id="count-demanded" style="background: #f59e0b; color: white;">5</span>
+        </button>
+      </div>
+
+      <!-- District Highlight Banner for Slide 2 -->
+      <div id="district-banner" style="display: none; background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;">
+        <strong style="color: #1b4332;">📍 Intradistrict Farm Gate Produce:</strong>
+        <span style="font-size: 12px; color: #2e7d32;">
+          Strictly filtered to your district (Guntur APMC). Enjoys <strong>&#8377;0 Interstate Highway Freight</strong>, same-day yard pickup, and zero fuel surcharges.
+        </span>
+      </div>
+
+      <!-- Search, Quantity & Budget Controls -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px;">
+          <div class="form-group">
+            <label>Search Crop Commodity:</label>
+            <input type="text" id="buyer-search" placeholder="e.g. Wheat, Chilli, Cotton..." oninput="renderBuyerCards()">
+          </div>
+
+          <div class="form-group">
+            <label>Required Quantity (kg):</label>
+            <input type="number" id="buyer-qty" value="60" min="1" step="1" oninput="renderBuyerCards()">
+          </div>
+
+          <div class="form-group">
+            <label>Max Budget Constraint (&#8377; INR):</label>
+            <input type="number" id="buyer-budget" value="2500" min="100" step="50" oninput="renderBuyerCards()">
+          </div>
+
+          <div class="form-group" id="region-filter-container">
+            <label>Market Region (District):</label>
+            <select id="buyer-zone" onchange="renderBuyerCards()">
+              <option value="ALL">All Market Regions (All India)</option>
+              <option value="AP_GUNTUR" selected>Guntur District (AP)</option>
+              <option value="AP_KRISHNA">Krishna / Amaravati (AP)</option>
+              <option value="PUN_KHANNA">Khanna Grain Terminal (Punjab)</option>
+              <option value="MH_NASHIK">Nashik Agro Yard (Maharashtra)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; font-size: 12px;">
+          <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox" id="only-budget" onchange="renderBuyerCards()">
+            <strong>Only Within Budget Matches</strong>
+          </label>
+          <span style="color: #52796F;" id="matching-summary">Showing matching lots...</span>
+        </div>
+      </div>
+
+      <!-- Buyer Marketplace Cards Grid -->
+      <div id="buyer-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px;">
+        <!-- Dynamically rendered via JavaScript -->
+      </div>
+    </div>
+
+    <!-- VIEW: FARMER PORTAL (4-Section Clean Layout) -->
+    <div id="view-farmer" class="view-panel" style="display: none;">
+      <!-- Farmer Navigation Sub-Tabs -->
+      <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid #E2DAC5; padding-bottom: 8px; overflow-x: auto;">
+        <button id="ftab-add" class="tab-btn active" onclick="switchFarmerSection('add')" style="padding: 8px 16px; font-size: 12px; font-weight: 700;">
+          🌾 Add Crop Listing
+        </button>
+        <button id="ftab-demanded" class="tab-btn" onclick="switchFarmerSection('demanded')" style="padding: 8px 16px; font-size: 12px; font-weight: 700;">
+          🔥 Most Demanded Crops
+        </button>
+        <button id="ftab-orders" class="tab-btn" onclick="switchFarmerSection('orders')" style="padding: 8px 16px; font-size: 12px; font-weight: 700;">
+          🚚 My Orders & Tracker
+        </button>
+        <button id="ftab-support" class="tab-btn" onclick="switchFarmerSection('support')" style="padding: 8px 16px; font-size: 12px; font-weight: 700;">
+          💬 Complaints & Support
+        </button>
+      </div>
+
+      <!-- Farmer Sub-Section 1: Add Crop Listing -->
+      <div id="fsec-add" class="farmer-section">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <!-- Left: Clean Farmer Form -->
+          <div class="card">
+            <h3 style="color: #1B4332; margin-top: 0;">🌾 Post New Crop Listing</h3>
+            <p style="font-size: 12px; color: #52796F; margin-bottom: 14px;">Publish harvest availability with silent background Python regression price guidance.</p>
+
+            <form onsubmit="handleFarmerSubmit(event)">
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label>Select Crop Commodity:</label>
+                <select id="farmer-crop" onchange="onFarmerCropChange()" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #D8CDB2; font-weight: 700;">
+                  <option value="Guntur Teja Red Chilli">🌶️ Guntur Teja Red Chilli (Base: ₹18,000/q)</option>
+                  <option value="Sharbati Durum Wheat">🌾 Sharbati Durum Wheat (Base: ₹2,450/q)</option>
+                  <option value="BPT 5204 Sona Masoori Paddy">🌾 BPT 5204 Sona Masoori Paddy (Base: ₹2,350/q)</option>
+                  <option value="Bt Cotton (Medium Staple)">🌱 Bt Cotton (Medium Staple) (Base: ₹7,500/q)</option>
+                  <option value="Yellow Soybean JS-335">🫘 Yellow Soybean JS-335 (Base: ₹4,800/q)</option>
+                </select>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label>Available Quantity (Quintals / 100 kg):</label>
+                <div style="display: flex; gap: 8px;">
+                  <input type="number" id="farmer-qty-q" value="12" min="1" step="0.5" oninput="syncFarmerQty('q')" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #D8CDB2; font-family: monospace; font-weight: 700;">
+                  <input type="number" id="farmer-qty-kg" value="1200" min="10" step="10" oninput="syncFarmerQty('kg')" style="flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #D8CDB2; font-family: monospace; font-weight: 700;">
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 10px; color: #52796F; margin-top: 2px;">
+                  <span>Quintals (100 kg)</span>
+                  <span>Total kg</span>
+                </div>
+              </div>
+
+              <!-- Clean System Recommended Price Badge (Predicted by ML Engine) -->
+              <div style="background: #e8f5e9; border: 2px solid #2e7d32; border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <strong style="color: #1b4332; font-size: 12px;">System Recommended Price:</strong>
+                  <span style="font-size: 10px; font-weight: 800; background: #c8e6c9; color: #1b4332; padding: 2px 6px; border-radius: 8px;">
+                    Predicted by ML Engine
+                  </span>
+                </div>
+                <div style="font-size: 16px; font-family: monospace; font-weight: 800; color: #1b4332; margin-top: 4px;" id="badge-ml-price">
+                  ₹18,000 / Quintal (₹180.00 / kg)
+                </div>
+                <p style="font-size: 11px; color: #2e7d32; margin: 4px 0 0 0;">
+                  Calculated silently in the background based on regional agro-climatic profile & Mandi momentum.
+                </p>
+                <button type="button" onclick="acceptMLPrice()" style="margin-top: 8px; background: #2D6A4F; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">
+                  ✓ Accept ML Recommended Price
+                </button>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label>Asking Price (₹ / Quintal):</label>
+                <input type="number" id="farmer-asking" value="18500" min="100" step="50" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid #D8CDB2; font-family: monospace; font-weight: 700;">
+              </div>
+
+              <button type="submit" style="width: 100%; padding: 10px; border-radius: 8px; border: none; background: #2D6A4F; color: white; font-weight: 700; cursor: pointer;">
+                Post Harvest Listing to APMC Market
+              </button>
+            </form>
+          </div>
+
+          <!-- Right: Active Farmer Lots -->
+          <div class="card">
+            <h3 style="color: #1B4332; margin-top: 0;">📦 My Active Harvest Lots</h3>
+            <div id="farmer-lots-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farmer Sub-Section 2: Most Demanded Crops -->
+      <div id="fsec-demanded" class="farmer-section" style="display: none;">
+        <div class="card" style="margin-bottom: 16px;">
+          <h3 style="color: #1B4332; margin-top: 0;">🔥 High Demand Commodities in Your District & State</h3>
+          <p style="font-size: 12px; color: #52796F;">Real-time buyer procurement volume and price momentum index.</p>
+        </div>
+        <div id="demanded-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- Farmer Sub-Section 3: Orders Tracker -->
+      <div id="fsec-orders" class="farmer-section" style="display: none;">
+        <div class="card">
+          <h3 style="color: #1B4332; margin-top: 0;">🚚 Mandi Delivery Tracker (Flipkart Style)</h3>
+          <div id="farmer-orders-container" style="margin-top: 12px;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Farmer Sub-Section 4: Complaints & Support -->
+      <div id="fsec-support" class="farmer-section" style="display: none;">
+        <div class="card" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="color: #1B4332; margin: 0;">💬 APMC Farmer Support & Dispute Resolution</h3>
+              <p style="font-size: 12px; color: #52796F; margin: 2px 0 0 0;">Track buyer payment disputes, tare variance, or freight delays.</p>
+            </div>
+            <button onclick="toggleComplaintForm()" style="background: #2D6A4F; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+              + Lodge New Ticket
+            </button>
+          </div>
+        </div>
+
+        <!-- Inline Complaint Form (Hidden by default) -->
+        <div id="complaint-form-card" class="card" style="display: none; margin-bottom: 16px; border: 2px solid #2D6A4F;">
+          <h4 style="color: #1B4332; margin-top: 0;">Lodge Dispute / Support Ticket</h4>
+          <form onsubmit="handleComplaintSubmit(event)">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">Category:</label>
+                <select id="comp-cat" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #ccc;">
+                  <option value="Payment Dispute">Payment Dispute (UPI / Escrow)</option>
+                  <option value="Delivery Issue">Delivery Delay (Logistics / Toll)</option>
+                  <option value="Weighing Mandi Issue">Weighbridge Tare Variance</option>
+                  <option value="Crop Quality">Buyer Crop Quality Contestation</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 12px; font-weight: 700;">Priority:</label>
+                <select id="comp-priority" style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #ccc;">
+                  <option value="MEDIUM">Medium</option>
+                  <option value="HIGH">High (APMC Escalation)</option>
+                  <option value="LOW">Low</option>
+                </select>
+              </div>
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label style="font-size: 12px; font-weight: 700;">Subject:</label>
+              <input type="text" id="comp-subject" placeholder="e.g. Escrow settlement pending for Order #ORD-AP-1001" required style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #ccc;">
+            </div>
+            <div style="margin-bottom: 10px;">
+              <label style="font-size: 12px; font-weight: 700;">Description:</label>
+              <textarea id="comp-desc" rows="2" placeholder="Provide details of the dispute..." required style="width: 100%; padding: 6px; border-radius: 6px; border: 1px solid #ccc;"></textarea>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+              <button type="button" onclick="toggleComplaintForm()" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #ccc; background: white; cursor: pointer;">Cancel</button>
+              <button type="submit" style="padding: 6px 14px; border-radius: 6px; border: none; background: #2D6A4F; color: white; font-weight: 700; cursor: pointer;">Submit Ticket</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Complaints List -->
+        <div id="complaints-list" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW: ORDER TRACKER -->
+    <div id="view-tracker" class="view-panel" style="display: none;">
+      <div class="card">
+        <h2>📦 Flipkart-Style APMC Order Tracker</h2>
+        <div id="active-order-display" style="margin-top: 14px;">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURCHASE ORDER MODAL -->
+  <div id="order-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E2DAC5; padding-bottom: 10px;">
+        <h3 style="margin: 0; color: #1B4332;">Confirm Purchase Order (Buy Now)</h3>
+        <button onclick="closeOrderModal()" style="background: none; border: none; font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+
+      <div id="modal-order-details" style="margin-top: 16px; font-size: 13px;">
+        <!-- Dynamically populated -->
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; border-top: 1px solid #E2DAC5; padding-top: 14px;">
+        <button onclick="closeOrderModal()" style="padding: 8px 16px; border-radius: 8px; border: 1px solid #ccc; background: white; cursor: pointer;">Cancel</button>
+        <button id="confirm-order-btn" onclick="executeOrder()" style="padding: 8px 18px; border-radius: 8px; border: none; background: #2D6A4F; color: white; font-weight: 700; cursor: pointer;">
+          Confirm Order (Status: PLACED)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-time Notification Toast -->
+  <div id="notif-toast" class="notification-toast" style="display: none;">
+    <strong id="notif-title">New Order Received!</strong>
+    <p id="notif-desc" style="margin: 4px 0 0 0; opacity: 0.9;"></p>
+  </div>
+
+  <!-- Standalone JavaScript Engine -->
+  <script>
+    // Master listings dataset
+    const SAMPLE_LISTINGS = [
+      { id: 'LST-101', crop: 'Guntur Teja Red Chilli', icon: '🌶️', farmer: 'K. Sambasiva Rao', zone: 'AP_GUNTUR', zoneName: 'Guntur District', stockKg: 3500, priceKg: 185.0, predPriceKg: 180.0, transitPerQ: 0, highDemand: true, trend7d: '+8.4%' },
+      { id: 'LST-102', crop: 'BPT 5204 Sona Masoori Paddy', icon: '🌾', farmer: 'V. Venkat Rao', zone: 'AP_KRISHNA', zoneName: 'Krishna District', stockKg: 8000, priceKg: 24.5, predPriceKg: 23.5, transitPerQ: 14.0, highDemand: true, trend7d: '+5.2%' },
+      { id: 'LST-103', crop: 'Bt Cotton (Medium Staple)', icon: '🌱', farmer: 'B. Patel', zone: 'AP_GUNTUR', zoneName: 'Guntur District', stockKg: 4200, priceKg: 76.0, predPriceKg: 75.0, transitPerQ: 0, highDemand: true, trend7d: '+4.1%' },
+      { id: 'LST-104', crop: 'Sharbati Durum Wheat', icon: '🌾', farmer: 'Sardar Harpreet Singh', zone: 'PUN_KHANNA', zoneName: 'Khanna Mandi (Punjab)', stockKg: 12000, priceKg: 26.0, predPriceKg: 24.5, transitPerQ: 88.0, highDemand: false, trend7d: '+1.8%' },
+      { id: 'LST-105', crop: 'Yellow Soybean JS-335', icon: '🫘', farmer: 'Devendra Joshi', zone: 'MH_NASHIK', zoneName: 'Nashik Yard (MH)', stockKg: 6500, priceKg: 49.0, predPriceKg: 48.0, transitPerQ: 55.0, highDemand: true, trend7d: '+6.9%' },
+      { id: 'LST-106', crop: 'Salem High-Curcumin Turmeric', icon: '🌿', farmer: 'M. Chennapa', zone: 'AP_GUNTUR', zoneName: 'Guntur District', stockKg: 2800, priceKg: 140.0, predPriceKg: 138.0, transitPerQ: 0, highDemand: true, trend7d: '+7.5%' }
+    ];
+
+    let currentSlide = 'all'; // 'all', 'district', 'demanded'
+    let currentFarmerSection = 'add'; // 'add', 'demanded', 'orders', 'support'
+    let academicMode = false;
+    let selectedListing = null;
+    let placedOrders = [
+      {
+        orderId: 'ORD-AP-1001',
+        crop: 'Guntur Teja Red Chilli',
+        icon: '🌶️',
+        farmer: 'K. Sambasiva Rao',
+        buyer: 'ITC Agri-Business Division',
+        qty: 60,
+        total: 11454,
+        status: 'DISPATCHED',
+        trackingNumber: 'TRK-APMC-881920',
+        route: 'Guntur -> Warangal -> Karnal (NH-44)'
+      },
+      {
+        orderId: 'ORD-AP-1002',
+        crop: 'Bt Cotton (Medium Staple)',
+        icon: '🌱',
+        farmer: 'K. Sambasiva Rao',
+        buyer: 'Coimbatore Spinning Mills',
+        qty: 500,
+        total: 39500,
+        status: 'PLACED',
+        trackingNumber: 'TRK-APMC-992014',
+        route: 'Guntur -> Nellore -> Coimbatore (NH-16)'
+      }
+    ];
+
+    let farmerComplaints = [
+      {
+        id: 'CMP-2026-001',
+        category: 'Payment Dispute',
+        priority: 'HIGH',
+        status: 'UNDER_REVIEW',
+        subject: 'Escrow settlement verification delay for Order #ORD-AP-1001',
+        desc: 'Buyer UPI payment confirmed on e-NAM gateway, awaiting APMC bank clearance of ₹11,454.',
+        officer: 'S. Ramana Murthy (APMC Officer)'
+      },
+      {
+        id: 'CMP-2026-002',
+        category: 'Delivery Issue',
+        priority: 'MEDIUM',
+        status: 'RESOLVED',
+        subject: 'Carrier lorry RFID toll tag cleared at Chilakaluripet plaza',
+        desc: 'Truck PB 10 CT 7782 was delayed 2 hours at toll plaza; toll administrator verified clearance.',
+        officer: 'K. Venkat Rao (Logistics Desk)'
+      }
+    ];
+
+    const ML_CROP_ESTIMATES = {
+      'Guntur Teja Red Chilli': { priceQ: 18000, priceKg: 180.0, icon: '🌶️' },
+      'Sharbati Durum Wheat': { priceQ: 2450, priceKg: 24.5, icon: '🌾' },
+      'BPT 5204 Sona Masoori Paddy': { priceQ: 2350, priceKg: 23.5, icon: '🌾' },
+      'Bt Cotton (Medium Staple)': { priceQ: 7500, priceKg: 75.0, icon: '🌱' },
+      'Yellow Soybean JS-335': { priceQ: 4800, priceKg: 48.0, icon: '🫘' }
+    };
+
+    function switchFarmerSection(sec) {
+      currentFarmerSection = sec;
+      document.querySelectorAll('.farmer-section').forEach(s => s.style.display = 'none');
+      ['add', 'demanded', 'orders', 'support'].forEach(id => {
+        const btn = document.getElementById('ftab-' + id);
+        if (btn) btn.classList.toggle('active', id === sec);
+      });
+      document.getElementById('fsec-' + sec).style.display = 'block';
+
+      if (sec === 'demanded') renderDemandedCrops();
+      if (sec === 'orders') renderFarmerOrders();
+      if (sec === 'support') renderComplaints();
+    }
+
+    function onFarmerCropChange() {
+      const cropName = document.getElementById('farmer-crop').value;
+      const data = ML_CROP_ESTIMATES[cropName] || { priceQ: 2500, priceKg: 25.0 };
+      document.getElementById('badge-ml-price').textContent = `₹${data.priceQ.toLocaleString('en-IN')} / Quintal (₹${data.priceKg.toFixed(2)} / kg)`;
+      document.getElementById('farmer-asking').value = data.priceQ;
+    }
+
+    function acceptMLPrice() {
+      const cropName = document.getElementById('farmer-crop').value;
+      const data = ML_CROP_ESTIMATES[cropName] || { priceQ: 2500, priceKg: 25.0 };
+      document.getElementById('farmer-asking').value = data.priceQ;
+      showNotification(`Accepted system recommended ML price: ₹${data.priceQ}/q`);
+    }
+
+    function syncFarmerQty(source) {
+      if (source === 'q') {
+        const q = parseFloat(document.getElementById('farmer-qty-q').value) || 0;
+        document.getElementById('farmer-qty-kg').value = Math.round(q * 100);
+      } else {
+        const kg = parseFloat(document.getElementById('farmer-qty-kg').value) || 0;
+        document.getElementById('farmer-qty-q').value = (kg / 100).toFixed(2);
+      }
+    }
+
+    function handleFarmerSubmit(e) {
+      e.preventDefault();
+      const cropName = document.getElementById('farmer-crop').value;
+      const qtyQ = parseFloat(document.getElementById('farmer-qty-q').value) || 10;
+      const askingQ = parseFloat(document.getElementById('farmer-asking').value) || 2500;
+      const askingKg = +(askingQ / 100).toFixed(2);
+      const data = ML_CROP_ESTIMATES[cropName] || { priceQ: 2500, priceKg: 25.0, icon: '🌾' };
+
+      const newListing = {
+        id: 'LST-' + Math.floor(200 + Math.random() * 800),
+        crop: cropName,
+        icon: data.icon,
+        farmer: 'K. Sambasiva Rao',
+        zone: 'AP_GUNTUR',
+        zoneName: 'Guntur District',
+        stockKg: Math.round(qtyQ * 100),
+        priceKg: askingKg,
+        predPriceKg: data.priceKg,
+        transitPerQ: 0,
+        highDemand: true,
+        trend7d: '+6.5%'
+      };
+
+      SAMPLE_LISTINGS.unshift(newListing);
+      renderFarmerLots();
+      showNotification(`Listing for ${cropName} (${newListing.stockKg} kg) published successfully with predicted_price!`);
+    }
+
+    function renderFarmerLots() {
+      const container = document.getElementById('farmer-lots-list');
+      if (!container) return;
+      container.innerHTML = '';
+      SAMPLE_LISTINGS.filter(l => l.farmer === 'K. Sambasiva Rao').forEach(lot => {
+        const item = document.createElement('div');
+        item.style.cssText = 'background: #FAF7EE; border: 1px solid #E2DAC5; border-radius: 8px; padding: 10px; font-size: 12px;';
+        item.innerHTML = `
+          <div style="display: flex; justify-content: space-between;">
+            <strong>${lot.icon} ${lot.crop}</strong>
+            <span style="background: #c8e6c9; color: #1b4332; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px;">ACTIVE</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 4px; color: #52796F;">
+            <span>Stock: <strong>${lot.stockKg} kg</strong></span>
+            <span>Asking: <strong style="color: #1B4332;">₹${lot.priceKg}/kg (₹${lot.priceKg * 100}/q)</strong></span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderDemandedCrops() {
+      const container = document.getElementById('demanded-grid');
+      if (!container) return;
+      container.innerHTML = '';
+      SAMPLE_LISTINGS.forEach(l => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="font-size: 28px;">${l.icon}</div>
+            <span class="high-demand-badge">🔥 ${l.trend7d} Demand</span>
+          </div>
+          <h4 style="margin: 6px 0 2px 0; color: #1B4332;">${l.crop}</h4>
+          <p style="font-size: 11px; color: #52796F; margin: 0 0 10px 0;">District APMC Demand Multiplier: <strong>1.15x</strong></p>
+          <div style="background: #FAF7EE; padding: 8px; border-radius: 8px; font-size: 11px; margin-bottom: 10px;">
+            <div>Avg Mandi Rate: <strong>₹${l.priceKg}/kg</strong></div>
+            <div>Buyer Procurement: <strong>${l.stockKg} kg this season</strong></div>
+          </div>
+          <button onclick="quickListCrop('${l.crop}')" style="width: 100%; background: #2D6A4F; color: white; border: none; padding: 8px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 11px;">
+            🌾 Quick List This Crop
+          </button>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function quickListCrop(cropName) {
+      document.getElementById('farmer-crop').value = cropName;
+      onFarmerCropChange();
+      switchFarmerSection('add');
+    }
+
+    function renderFarmerOrders() {
+      const container = document.getElementById('farmer-orders-container');
+      if (!container) return;
+      container.innerHTML = '';
+      placedOrders.forEach(o => {
+        const el = document.createElement('div');
+        el.style.cssText = 'background: #FAF7EE; border: 1px solid #E2DAC5; border-radius: 12px; padding: 14px; margin-bottom: 12px;';
+        el.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-family: monospace; font-size: 11px; font-weight: 800; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #ccc;">${o.orderId}</span>
+              <strong style="margin-left: 6px; color: #1B4332;">${o.icon} ${o.crop} (${o.qty} kg)</strong>
+            </div>
+            <strong style="color: #2D6A4F;">₹${o.total}</strong>
+          </div>
+          <p style="font-size: 11px; color: #52796F; margin: 4px 0 10px 0;">Buyer: <strong>${o.buyer}</strong> &bull; Route: ${o.route || 'Local Intradistrict Corridor'}</p>
+          <div class="tracker-steps" style="margin: 10px 0;">
+            <div class="tracker-step completed"><div class="tracker-circle">✓</div><span>Placed</span></div>
+            <div class="tracker-step ${o.status !== 'PLACED' ? 'completed' : ''}"><div class="tracker-circle">2</div><span>Paid</span></div>
+            <div class="tracker-step ${o.status === 'DISPATCHED' || o.status === 'DELIVERED' ? 'completed' : ''}"><div class="tracker-circle">3</div><span>Dispatched</span></div>
+            <div class="tracker-step ${o.status === 'DELIVERED' ? 'completed' : ''}"><div class="tracker-circle">4</div><span>Delivered</span></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+            <span style="font-size: 11px; color: #52796F;">Status: <strong>${o.status}</strong></span>
+            ${o.status !== 'DELIVERED' ? `<button onclick="advanceOrderStatus('${o.orderId}')" style="background: #2D6A4F; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer;">Advance Status ➔</button>` : '<span style="color: #2e7d32; font-weight: 700; font-size: 11px;">✓ Completed</span>'}
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function toggleComplaintForm() {
+      const card = document.getElementById('complaint-form-card');
+      card.style.display = card.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function handleComplaintSubmit(e) {
+      e.preventDefault();
+      const cat = document.getElementById('comp-cat').value;
+      const priority = document.getElementById('comp-priority').value;
+      const subject = document.getElementById('comp-subject').value;
+      const desc = document.getElementById('comp-desc').value;
+
+      const newC = {
+        id: 'CMP-2026-' + Math.floor(100 + Math.random() * 900),
+        category: cat,
+        priority: priority,
+        status: 'OPEN',
+        subject: subject,
+        desc: desc,
+        officer: 'APMC Guntur Nodal Officer'
+      };
+
+      farmerComplaints.unshift(newC);
+      toggleComplaintForm();
+      renderComplaints();
+      showNotification(`Ticket #${newC.id} lodged successfully!`);
+    }
+
+    function renderComplaints() {
+      const container = document.getElementById('complaints-list');
+      if (!container) return;
+      container.innerHTML = '';
+      farmerComplaints.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.style.borderLeft = c.status === 'RESOLVED' ? '4px solid #2e7d32' : '4px solid #f59e0b';
+        el.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-family: monospace; font-size: 11px; font-weight: 800; background: #FAF7EE; padding: 2px 6px; border-radius: 4px; border: 1px solid #ccc;">${c.id}</span>
+              <span style="font-size: 10px; font-weight: 800; background: #eee; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">${c.category}</span>
+            </div>
+            <span style="font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: ${c.status === 'RESOLVED' ? '#c8e6c9' : '#fff3e0'}; color: ${c.status === 'RESOLVED' ? '#1b4332' : '#e65100'};">
+              ${c.status}
+            </span>
+          </div>
+          <h4 style="margin: 8px 0 4px 0; color: #1B4332;">${c.subject}</h4>
+          <p style="font-size: 12px; color: #52796F; margin: 0 0 8px 0;">${c.desc}</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #eee; padding-top: 6px; font-size: 11px; color: #52796F;">
+            <span>Assigned: <strong>${c.officer}</strong></span>
+            ${c.status !== 'RESOLVED' ? `<button onclick="resolveComplaint('${c.id}')" style="background: none; border: 1px solid #2e7d32; color: #2e7d32; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer;">Mark Resolved</button>` : ''}
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+
+    function resolveComplaint(id) {
+      const c = farmerComplaints.find(comp => comp.id === id);
+      if (c) c.status = 'RESOLVED';
+      renderComplaints();
+    }
+
+    function toggleAcademicMode() {
+      academicMode = !academicMode;
+      document.getElementById('academic-debug-panel').style.display = academicMode ? 'block' : 'none';
+      document.getElementById('academic-toggle').classList.toggle('on', academicMode);
+      document.getElementById('toggle-state').textContent = academicMode ? 'ON' : 'OFF';
+    }
+
+    function switchMainView(view) {
+      document.querySelectorAll('.view-panel').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (view === 'buyer') {
+        document.getElementById('view-buyer').style.display = 'block';
+        event.target.classList.add('active');
+        renderBuyerCards();
+      } else if (view === 'farmer') {
+        document.getElementById('view-farmer').style.display = 'block';
+        event.target.classList.add('active');
+      } else if (view === 'tracker') {
+        document.getElementById('view-tracker').style.display = 'block';
+        event.target.classList.add('active');
+        renderOrderTracker();
+      }
+    }
+
+    function switchBuyerSlide(slide) {
+      currentSlide = slide;
+      document.querySelectorAll('.slide-btn').forEach(b => b.classList.remove('active'));
+      if (slide === 'all') document.getElementById('tab-slide1').classList.add('active');
+      if (slide === 'district') document.getElementById('tab-slide2').classList.add('active');
+      if (slide === 'demanded') document.getElementById('tab-slide3').classList.add('active');
+
+      document.getElementById('district-banner').style.display = (slide === 'district') ? 'block' : 'none';
+      document.getElementById('region-filter-container').style.display = (slide === 'all') ? 'block' : 'none';
+      renderBuyerCards();
+    }
+
+    function renderBuyerCards() {
+      const search = document.getElementById('buyer-search').value.toLowerCase().trim();
+      const qty = parseFloat(document.getElementById('buyer-qty').value) || 60;
+      const budget = parseFloat(document.getElementById('buyer-budget').value) || 2500;
+      const onlyBudget = document.getElementById('only-budget').checked;
+      const zone = document.getElementById('buyer-zone').value;
+
+      const grid = document.getElementById('buyer-cards-grid');
+      grid.innerHTML = '';
+
+      let filtered = SAMPLE_LISTINGS.filter(l => {
+        // Slide 2: District filter
+        if (currentSlide === 'district' && l.zone !== 'AP_GUNTUR') return false;
+        // Slide 3: High Demand filter
+        if (currentSlide === 'demanded' && !l.highDemand) return false;
+        // Search filter
+        if (search && !l.crop.toLowerCase().includes(search) && !l.farmer.toLowerCase().includes(search)) return false;
+        // Region filter (Slide 1)
+        if (currentSlide === 'all' && zone !== 'ALL' && l.zone !== zone) return false;
+        return true;
+      });
+
+      // Compute pricing & budget
+      const cards = filtered.map(l => {
+        const produceCost = Math.round(qty * l.priceKg);
+        const transitCost = Math.round((qty / 100) * l.transitPerQ);
+        const totalLanded = produceCost + transitCost;
+        const isWithin = totalLanded <= budget;
+        const variancePct = Math.round(((l.priceKg - l.predPriceKg) / l.predPriceKg) * 100);
+        return { ...l, produceCost, transitCost, totalLanded, isWithin, variancePct };
+      });
+
+      const finalCards = onlyBudget ? cards.filter(c => c.isWithin) : cards;
+      document.getElementById('matching-summary').textContent = `Found ${finalCards.length} matching lots for ${qty} kg (Budget: ₹${budget})`;
+
+      finalCards.forEach(c => {
+        const cardEl = document.createElement('div');
+        cardEl.className = 'card';
+        cardEl.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: start;">
+            <div style="font-size: 32px; background: #FAF7EE; border-radius: 12px; padding: 6px 12px;">${c.icon}</div>
+            ${c.highDemand 
+              ? '<span style="background: #e8f5e9; color: #1b4332; border: 1px solid #c8e6c9; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 12px;">🔥 High Demand</span>'
+              : '<span style="background: #f1f8e9; color: #33691e; border: 1px solid #dcedc8; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 12px;">✓ In Stock</span>'}
+          </div>
+
+          <div style="margin-top: 10px;">
+            <h3 style="margin: 0 0 2px 0; color: #1B4332; font-size: 15px;">${c.crop}</h3>
+            <div style="font-size: 11px; color: #52796F;">📍 ${c.zoneName} &bull; Farmer: <strong>${c.farmer}</strong></div>
+          </div>
+
+          <div style="margin-top: 10px; border-top: 1px solid #E2DAC5; padding-top: 8px; display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-size: 11px; color: #52796F;">Mandi Price:</span>
+            <span style="font-size: 16px; font-weight: 800; color: #1B4332;">₹${c.priceKg} <span style="font-size: 11px; font-weight: normal; color: #52796F;">/ kg</span></span>
+          </div>
+
+          <div class="card-footer-action" style="margin-top: 12px;">
+            <button class="btn-buy" style="width: 100%;" onclick="openOrderModal('${c.id}')">
+              View Details
+            </button>
+          </div>
+        `;
+        grid.appendChild(cardEl);
+      });
+    }
+
+    function openOrderModal(listingId) {
+      selectedListing = SAMPLE_LISTINGS.find(l => l.id === listingId);
+      const qty = parseFloat(document.getElementById('buyer-qty').value) || 60;
+      const produceCost = Math.round(qty * selectedListing.priceKg);
+      const transitCost = Math.round((qty / 100) * selectedListing.transitPerQ);
+      const total = produceCost + transitCost;
+
+      document.getElementById('modal-order-details').innerHTML = `
+        <p><strong>Crop Commodity:</strong> ${selectedListing.icon} ${selectedListing.crop}</p>
+        <p><strong>Producer (Farmer):</strong> ${selectedListing.farmer} (${selectedListing.zoneName})</p>
+        <p><strong>Quantity:</strong> ${qty} kg (${(qty/100).toFixed(2)} Quintals)</p>
+        <hr style="border: 0; border-top: 1px solid #E2DAC5; margin: 10px 0;">
+        <div style="display: flex; justify-content: space-between;">
+          <span>Farm Gate Produce:</span>
+          <strong>₹${produceCost}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span>ADSA Dijkstra Freight:</span>
+          <strong>₹${transitCost}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 15px; margin-top: 6px; color: #1B4332;">
+          <strong>Total Landed Cost:</strong>
+          <strong>₹${total}</strong>
+        </div>
+      `;
+      document.getElementById('order-modal').style.display = 'flex';
+    }
+
+    function closeOrderModal() {
+      document.getElementById('order-modal').style.display = 'none';
+    }
+
+    function executeOrder() {
+      const qty = parseFloat(document.getElementById('buyer-qty').value) || 60;
+      const produceCost = Math.round(qty * selectedListing.priceKg);
+      const transitCost = Math.round((qty / 100) * selectedListing.transitPerQ);
+      const total = produceCost + transitCost;
+      const orderId = 'ORD-AP-' + Math.floor(1000 + Math.random() * 9000);
+
+      const newOrder = {
+        orderId,
+        crop: selectedListing.crop,
+        icon: selectedListing.icon,
+        farmer: selectedListing.farmer,
+        buyer: 'Amaravati Agri Processors',
+        qty,
+        total,
+        status: 'PLACED',
+        trackingNumber: 'TRK-APMC-' + Math.floor(100000 + Math.random() * 900000)
+      };
+      placedOrders.unshift(newOrder);
+
+      closeOrderModal();
+
+      // Trigger Notification
+      showNotification(`New Order received for ${selectedListing.crop} (${qty} kg) from Buyer Amaravati Agri Processors`);
+
+      // Switch to Order Tracker
+      setTimeout(() => {
+        switchMainView('tracker');
+      }, 1200);
+    }
+
+    function showNotification(msg) {
+      const toast = document.getElementById('notif-toast');
+      document.getElementById('notif-desc').textContent = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 4000);
+    }
+
+    function renderOrderTracker() {
+      const container = document.getElementById('active-order-display');
+      if (placedOrders.length === 0) {
+        container.innerHTML = `<p style="color: #52796F; text-align: center; padding: 30px;">No orders placed yet. Click "Buy Now" on any crop lot in the Buyer Portal.</p>`;
+        return;
+      }
+      const order = placedOrders[0];
+      container.innerHTML = `
+        <div style="background: #FAF7EE; border: 1px solid #E2DAC5; border-radius: 12px; padding: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <span style="font-family: monospace; font-weight: 800; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #ccc;">${order.orderId}</span>
+              <h3 style="margin: 6px 0 0 0; color: #1B4332;">${order.icon} ${order.crop} (${order.qty} kg)</h3>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 11px; color: #52796F;">Tracking No: ${order.trackingNumber}</div>
+              <strong style="color: #2D6A4F; font-size: 16px;">₹${order.total}</strong>
+            </div>
+          </div>
+
+          <!-- Flipkart Tracker Milestones -->
+          <div class="tracker-steps">
+            <div class="tracker-step completed">
+              <div class="tracker-circle">✓</div>
+              <span>Placed</span>
+            </div>
+            <div class="tracker-step ${order.status !== 'PLACED' ? 'completed' : ''}">
+              <div class="tracker-circle">2</div>
+              <span>Paid</span>
+            </div>
+            <div class="tracker-step ${order.status === 'DISPATCHED' || order.status === 'DELIVERED' ? 'completed' : ''}">
+              <div class="tracker-circle">3</div>
+              <span>Dispatched via Dijkstra Route</span>
+            </div>
+            <div class="tracker-step ${order.status === 'DELIVERED' ? 'completed' : ''}">
+              <div class="tracker-circle">4</div>
+              <span>Delivered</span>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 10px; margin-top: 14px;">
+            <button onclick="advanceOrderStatus('${order.orderId}')" style="background: #2D6A4F; color: white; border: none; padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+              Advance Order Stage ➔
+            </button>
+            <button onclick="printInvoice('${order.orderId}')" style="background: white; border: 1px solid #2D6A4F; color: #1B4332; padding: 8px 14px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+              📄 Download GST Receipt
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function advanceOrderStatus(orderId) {
+      const ord = placedOrders.find(o => o.orderId === orderId);
+      if (!ord) return;
+      if (ord.status === 'PLACED') ord.status = 'PAID';
+      else if (ord.status === 'PAID') ord.status = 'DISPATCHED';
+      else if (ord.status === 'DISPATCHED') ord.status = 'DELIVERED';
+      renderOrderTracker();
+    }
+
+    function printInvoice(orderId) {
+      window.print();
+    }
+
+    // Initial render
+    renderBuyerCards();
+  </script>
+</body>
+</html>

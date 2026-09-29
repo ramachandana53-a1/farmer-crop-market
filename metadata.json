@@ -1,0 +1,7 @@
+{
+  "name": "Agri Market",
+  "description": "Agri Market: Real-time district Mandi market rates, instant order processing, Dijkstra transit routing, and role-isolated agricultural commerce.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
